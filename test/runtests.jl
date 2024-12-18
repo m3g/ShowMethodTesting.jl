@@ -1,6 +1,11 @@
 using ShowMethodTesting
 using Test
 
+@testset "Aqua.test_all" begin
+    import Aqua
+    Aqua.test_all(ShowMethodTesting)
+end
+
 @testset "ShowMethodTesting.jl" begin
     struct A
         x::Int
