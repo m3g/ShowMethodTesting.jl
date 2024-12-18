@@ -15,7 +15,7 @@ exports a single function `parse_show` which, receiving an instance of a structu
 The function `parse_show` returns then a custom object which can be compared with `isapprox` to 
 the string copy/pasted from the show of the custom type.
 
-# The `parse_show` function:
+## The `parse_show` function:
 
 ```julia
 parse_show(x; vector_simplify=true, repl=Dict())
@@ -23,13 +23,13 @@ parse_show(x; vector_simplify=true, repl=Dict())
 
 Parse the output of `show` to a `TestShowString` object, which can be compared with `isapprox` (`≈`).
 
-## Arguments
+### Arguments
 
 - `x`: object to parse
 - `vector_simplify`: if `true`, only the first and last elements of arrays are kept
 - `repl`: dictionary with custom replacements to be made before parsing
 
-## Comparison arguments
+### Comparison arguments
 
 The `isapprox` function comparing two `TestShowString` objects has the following keyword arguments:
 
@@ -38,7 +38,7 @@ The `isapprox` function comparing two `TestShowString` objects has the following
 - `path`: function to compare two paths
 - `assertion_error`: if `true`, throws an `AssertionError` if the comparison fails
 
-# Example
+### Example
 
 ```julia-repl
 julia> using ShowMethodTesting
