@@ -32,9 +32,9 @@ to other `ParsedShow` objects or to strings.
 - `vector_simplify`: if `true`, only the first and last elements of arrays are kept
 - `repl`: dictionary with custom replacements to be made before parsing
 
-### Comparison arguments
+### Comparison arguments for `isapprox`
 
-The `isapprox` function comparing two `TestShowString` objects has the following keyword arguments:
+The `isapprox` function comparing two `ParsedShow` objects has the following keyword arguments:
 
 - `f64`: function to compare two floats
 - `i64`: function to compare two integers
