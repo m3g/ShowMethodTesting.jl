@@ -34,7 +34,7 @@ to other `ParsedShow` objects or to strings.
 
 ### Comparison arguments for `isapprox`
 
-The `isapprox` function comparing two `ParsedShow` objects has the following keyword arguments:
+The `isapprox` function comparing `ParsedShow` objects (between each other, or to strings) has the following keyword arguments:
 
 - `f64`: function to compare two floats
 - `i64`: function to compare two integers
