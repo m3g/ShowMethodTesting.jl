@@ -5,7 +5,7 @@ export parse_show
 struct TestShowString
     parsed_show::String
 end
-Base.show(io::IO, x::TestShowString) = print(io, x.parsed_show)
+Base.show(io::IO, ::MIME"text/plain", x::TestShowString) = print(io, x.parsed_show)
 
 function Base.isapprox(
     x::TestShowString,
@@ -28,29 +28,29 @@ function Base.isapprox(
         end
         return true
     end
-    s = x.parsed_show
-    ss = y.parsed_show
     # Custom substitutions
-    sfields = split(s)
-    ssfields = split(ss)
+    xfields = split(x.parsed_show)
+    yfields = split(y.parsed_show)
     all_match = true
-    for (f1, f2) in zip(sfields, ssfields)
+    for (xf, yf) in zip(xfields, yfields)
         !all_match && break
-        if ispath(f2) || ispath(f1) # only compares the last entry for paths
-            all_match = match(path, last(splitpath(f1)), last(splitpath(f2)))
-            continue
-        end
-        value = tryparse(Int, f1) # test if f1 can be interpreted as an integer
+        value = tryparse(Int, xf) # test if xf can be interpreted as an integer
         if !isnothing(value)
-            all_match = match(i64, value, tryparse(Int, f2))
+            all_match = match(i64, value, tryparse(Int, yf))
             continue
         end
-        value = tryparse(Float64, f1) # test if f1 can be interpreted as a float
+        value = tryparse(Float64, xf) # test if xf can be interpreted as a float
         if !isnothing(value)
-            all_match = match(f64, value, tryparse(Float64, f2))
+            all_match = match(f64, value, tryparse(Float64, yf))
             continue
         end
-        all_match = match(isequal, f1, f2)
+        xf = strip(xf, ',')
+        yf = strip(yf, ',')
+        if ispath(yf) || ispath(xf) # only compares the last entry for paths
+            all_match = match(path, last(splitpath(xf)), last(splitpath(yf)))
+            continue
+        end
+        all_match = match(isequal, xf, yf)
     end
     return all_match
 end
