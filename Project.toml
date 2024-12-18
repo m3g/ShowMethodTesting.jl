@@ -1,7 +1,7 @@
 name = "ShowMethodTesting"
 uuid = "aed2ae9c-e0a3-4a50-8068-bdeec279239a"
 authors = ["Leandro Martinez <lmartine@unicamp.br> and contributors"]
-version = "1.0.0-DEV"
+version = "1.0.0"
 
 [deps]
 
