@@ -56,4 +56,11 @@ Object with Int(1), /usr/bin/bash and [1.0, 3.141592653589793, 7.5, 1.4142135623
 
 julia> parse_show(a) ≈ "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"
 true
+
+
+julia> isapprox(parse_show(a), "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"; f64 = (x,y) -> x == y, assertion_error=false)
+false
 ```
+
+Note that in the last line we have set the comparison function for floats to be exact, which is why the comparison fails. And the
+`assertion_error` is set to `false`, so the function returns `false` instead of throwing an error.
