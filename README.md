@@ -11,7 +11,7 @@ exports a single function `parse_show` which, receiving an instance of a structu
 - Numbers are isolated from other characters (except dots), and compared up to a precision defined 
   by the user (by default equality for integers and rtol=1e-3 for floats).
 - Paths are identified and compared only for their last entry (the file name or last directory entry).
-- Arrays are simplified and only the first and last elements are compared, to avoid errors associated
+- Arrays, identified by braces, are simplified and only the first and last elements are compared, to avoid errors associated
   to the number of elements printed. 
 
 The function `parse_show` returns then a custom object which can be compared with `isapprox` to 
