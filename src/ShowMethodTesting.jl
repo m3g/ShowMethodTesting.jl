@@ -100,7 +100,7 @@ function Base.isapprox(
             if assertion_error
                 throw(AssertionError("""\n
 
-                    show method comparison with $x1 ($(typeof(x1))) == $x2 ($(typeof(x2)))
+                    show method comparison failed for $x1 ($(typeof(x1))) == $x2 ($(typeof(x2)))
 
                 """))
             end

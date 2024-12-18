@@ -75,7 +75,7 @@ julia> parse_show(a) ≈ "Object with Int(2), /usr/bin/bash and [1.0, 3.1415, 7.
 ERROR: AssertionError: 
 
 
-    show method comparison failed with 1 (Int64) == 2 (Int64)
+    show method comparison failed for 1 (Int64) == 2 (Int64)
 
 
 Stacktrace:
