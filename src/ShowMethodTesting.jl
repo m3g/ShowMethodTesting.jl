@@ -41,7 +41,7 @@ Object with Int(1), /usr/bin/bash and [1.0, 3.141592653589793, 7.5, 1.4142135623
 julia> parse_show(a) ≈ "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"
 true
 
-julia> isapprox(parse_show(a), "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"; f64 = (x,y) -> x == y, assertion_error=false)
+julia> isapprox(parse_show(a), "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"; float_match = (x,y) -> x == y, assertion_error=false)
 false
 ```
 
@@ -67,9 +67,9 @@ end
 
 """
     isapprox(x::ParsedShow, y::ParsedShow
-        f64=(x1, x2) -> isapprox(x1, x2, rtol=1e-3),
-        i64=(x1, x2) -> x1 == x2,
-        path=(x1, x2) -> last(splitpath(x1)) == last(splitpath(x2)),
+        float_match=(x1, x2) -> isapprox(x1, x2, rtol=1e-3),
+        int_match=(x1, x2) -> x1 == x2,
+        path_match=(x1, x2) -> last(splitpath(x1)) == last(splitpath(x2)),
         assertion_error=true,
     )
     isapprox(x::ParsedShow, y::String; kargs...) = isapprox(x, parse_show(y); kargs...)
@@ -81,18 +81,18 @@ Compare two `ParsedShow` objects, with custom comparison functions for floats, i
 
 - `x`: first object to compare
 - `y`: second object to compare
-- `f64`: function to compare two floats
-- `i64`: function to compare two integers
-- `path`: function to compare two paths
+- `float_match`: function to compare two floats
+- `int_match`: function to compare two integers
+- `path_match`: function to compare two paths
 - `assertion_error`: if `true`, throws an `AssertionError` if the comparison fails
 
 """
 function Base.isapprox(
     x::ParsedShow,
     y::ParsedShow;
-    f64=(x1, x2) -> isapprox(x1, x2, rtol=1e-3),
-    i64=(x1, x2) -> x1 == x2,
-    path=(x1, x2) -> last(splitpath(x1)) == last(splitpath(x2)),
+    float_match=(x1, x2) -> isapprox(x1, x2, rtol=1e-3),
+    int_match=(x1, x2) -> x1 == x2,
+    path_match=(x1, x2) -> last(splitpath(x1)) == last(splitpath(x2)),
     assertion_error=true,
 )
     match(f, x1, x2) = begin
@@ -116,18 +116,18 @@ function Base.isapprox(
         !all_match && break
         value = tryparse(Int, xf) # test if xf can be interpreted as an integer
         if !isnothing(value)
-            all_match = match(i64, value, tryparse(Int, yf))
+            all_match = match(int_match, value, tryparse(Int, yf))
             continue
         end
         value = tryparse(Float64, xf) # test if xf can be interpreted as a float
         if !isnothing(value)
-            all_match = match(f64, value, tryparse(Float64, yf))
+            all_match = match(float_match, value, tryparse(Float64, yf))
             continue
         end
         xf = strip(xf, ',')
         yf = strip(yf, ',')
         if ispath(yf) || ispath(xf) # only compares the last entry for paths
-            all_match = match(path, last(splitpath(xf)), last(splitpath(yf)))
+            all_match = match(path_match, last(splitpath(xf)), last(splitpath(yf)))
             continue
         end
         all_match = match(isequal, xf, yf)

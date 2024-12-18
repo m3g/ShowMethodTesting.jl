@@ -32,13 +32,13 @@ to other `ParsedShow` objects or to strings.
 - `vector_simplify`: if `true`, only the first and last elements of arrays are kept
 - `repl`: dictionary with custom replacements to be made before parsing
 
-### Comparison arguments
+### Comparison arguments for `isapprox`
 
-The `isapprox` function comparing two `TestShowString` objects has the following keyword arguments:
+The `isapprox` function comparing `ParsedShow` objects (between each other, or to strings) has the following keyword arguments:
 
-- `f64`: function to compare two floats
-- `i64`: function to compare two integers
-- `path`: function to compare two paths
+- `float_match`: function to compare two floats
+- `int_match`: function to compare two integers
+- `path_match`: function to compare two paths
 - `assertion_error`: if `true`, throws an `AssertionError` if the comparison fails
 
 ### Example
@@ -60,7 +60,7 @@ Object with Int(1), /usr/bin/bash and [1.0, 3.141592653589793, 7.5, 1.4142135623
 julia> parse_show(a) ≈ "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"
 true
 
-julia> isapprox(parse_show(a), "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"; f64 = (x,y) -> x == y, assertion_error=false)
+julia> isapprox(parse_show(a), "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"; float_match = (x,y) -> x == y, assertion_error=false)
 false
 ```
 
