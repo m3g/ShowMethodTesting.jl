@@ -66,3 +66,18 @@ false
 
 Note that in the last line we have set the comparison function for floats to be exact, which is why the comparison fails. And the
 `assertion_error` is set to `false`, so the function returns `false` instead of throwing an error.
+
+The utility of throwing an error is that the error message contains the comparison that caused the failure. For example, here
+we modified `Int(1)` to `Int(2)` in the expected output:
+
+```julia-repl
+julia> parse_show(a) ≈ "Object with Int(2), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"
+ERROR: AssertionError: 
+
+
+    show method comparison failed with 1 (Int64) == 2 (Int64)
+
+
+Stacktrace:
+...
+```
