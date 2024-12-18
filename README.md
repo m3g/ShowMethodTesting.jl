@@ -23,7 +23,8 @@ the string copy/pasted from the show of the custom type.
 parse_show(x; vector_simplify=true, repl=Dict())
 ```
 
-Parse the output of `show` to a `TestShowString` object, which can be compared with `isapprox` (`≈`).
+Parse the output of `show` to a `ParsedShow` object, which can be compared with `isapprox` (`≈`),
+to other `ParsedShow` objects or to strings. 
 
 ### Arguments
 
