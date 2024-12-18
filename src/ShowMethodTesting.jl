@@ -49,14 +49,7 @@ Note that in the last line we have set the comparison function for floats to be 
 `assertion_error` is set to `false`, so the function returns `false` instead of throwing an error.
 
 """
-function parse_show(x;
-    vector_simplify=true,
-    repl=Dict(),
-)
-    buff = IOBuffer()
-    show(buff, MIME"text/plain"(), x)
-    parse_show(String(take!(buff)); vector_simplify, repl)
-end
+parse_show(x; vector_simplify=true, repl=Dict()) = parse_show(repr("text/plain", x); vector_simplify, repl)
 
 function parse_show(x::String;
     vector_simplify=true,
