@@ -7,6 +7,7 @@ using Test
 end
 
 @testset "ShowMethodTesting.jl" begin
+    using ShowMethodTesting
     struct A
         x::Int
         path::String
@@ -21,4 +22,9 @@ end
     @test !isapprox(parse_show(a), "Object with Int(2), /usr/bin/bash and [1.0, 3.141592653589793, 7.5, 1.4142135623730951]"; assertion_error=false)
     # Test show method
     @test contains(repr("text/plain", parse_show(a)), "Object with Int( 1 )")
+    @test parse_show([a, a, a, a]; repl=Dict("/usr/bin/bash" => "", r"^((?:[^\n]*\n){3}).*"s => s"\1")) ≈ """
+        4 -element Vector{A}:
+        Object with Int( 1 ),  and [ 1.0 1.4142135623730951 ]
+        Object with Int( 1 ),  and [ 1.0 1.4142135623730951 ]
+    """
 end
