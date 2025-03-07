@@ -56,7 +56,10 @@ function parse_show(x::String;
     repl=Dict(),
 )
     # Custom replacements
-    s = replace(x, repl...)
+    s = x
+    for (k, v) in repl
+        s = replace(s, k => v)
+    end
     # add spaces between digits and other characters (except dots), to interpret them as numbers
     s = replace(s, r"(?<=\d)(?=[^\d.])|(?<=[^\d.])(?=\d)" => s" ")
     if vector_simplify # keep only first and last array elements
