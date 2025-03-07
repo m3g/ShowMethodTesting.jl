@@ -105,6 +105,12 @@ function Base.isapprox(
 
                     show method comparison failed for $x1 ($(typeof(x1))) == $x2 ($(typeof(x2)))
 
+                    full parsed show strings:
+
+                    $x
+
+                    $y
+
                 """))
             end
             return false
