@@ -8,8 +8,8 @@ end
 Base.show(io::IO, ::MIME"text/plain", x::ParsedShow) = print(io, x.parsed_show)
 
 """
-    parse_show(x; vector_simplify=true, repl=Dict())
-    parse_show(x::String; vector_simplify=true, repl=Dict())
+    parse_show(x; vector_simplify=true, repl=())
+    parse_show(x::String; vector_simplify=true, repl)
 
 Parse the output of `show` to a `ParsedShow` object, which can be compared with `isapprox` (`≈`).
 
@@ -17,7 +17,8 @@ Parse the output of `show` to a `ParsedShow` object, which can be compared with 
 
 - `x`: object to parse
 - `vector_simplify`: if `true`, only the first and last elements of arrays are kept
-- `repl`: dictionary with custom replacements to be made before parsing
+- `repl`: container of Pair(s) with custom replacements to be made before parsing. The replacements 
+   will be applied from left to right for ordered collections.
 
 A `ParsedShow` object can be compared to another `ParsedShow` object or a string with `isapprox`.
 See the `isapprox` function for more details.
@@ -49,12 +50,19 @@ Note that in the last line we have set the comparison function for floats to be 
 `assertion_error` is set to `false`, so the function returns `false` instead of throwing an error.
 
 """
-parse_show(x; vector_simplify=true, repl=Dict()) = parse_show(repr("text/plain", x); vector_simplify, repl)
+parse_show(x; vector_simplify=true, repl=()) = parse_show(repr("text/plain", x); vector_simplify, repl)
 
 function parse_show(x::String;
     vector_simplify=true,
-    repl=Dict(),
-)
+    repl=(),
+) 
+    if length(repl) > 0 && !(eltype(repl) <: Pair)
+        throw(ArgumentError("""\n
+            
+            The `repl` argument must be a container of Pair(s), e.g. Dict("old" => "new") or [ "old" => "new" ].
+
+        """))
+    end
     # Custom replacements
     s = x
     for (k, v) in repl
