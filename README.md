@@ -20,7 +20,7 @@ the string copy/pasted from the show of the custom type.
 ## The `parse_show` function:
 
 ```julia
-parse_show(x; vector_simplify=true, repl=Dict())
+parse_show(x; vector_simplify=true, repl=())
 ```
 
 Parse the output of `show` to a `ParsedShow` object, which can be compared with `isapprox` (`≈`),
@@ -30,7 +30,9 @@ to other `ParsedShow` objects or to strings.
 
 - `x`: object to parse
 - `vector_simplify`: if `true`, only the first and last elements of arrays are kept
-- `repl`: dictionary with custom replacements to be made before parsing
+- `repl`: container with custom replacements to be made before parsing. The replacements must
+   be defined as a list of Pair(s), and are applied from left to right in the case of ordered
+   collections. (example: `repl=["new" => "old", "bad" => "good"]`). 
 
 ### Comparison arguments for `isapprox`
 
