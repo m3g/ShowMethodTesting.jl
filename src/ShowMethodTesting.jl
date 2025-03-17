@@ -20,6 +20,11 @@ Parse the output of `show` to a `ParsedShow` object, which can be compared with 
 - `repl`: container of Pair(s) with custom replacements to be made before parsing. The replacements 
    will be applied from left to right for ordered collections.
 
+# Optional arguments, forwared to `repr`
+
+- `mime`: MIME type of the representation
+- `context`: context of the representation
+
 A `ParsedShow` object can be compared to another `ParsedShow` object or a string with `isapprox`.
 See the `isapprox` function for more details.
 
@@ -50,7 +55,19 @@ Note that in the last line we have set the comparison function for floats to be 
 `assertion_error` is set to `false`, so the function returns `false` instead of throwing an error.
 
 """
-parse_show(x; vector_simplify=true, repl=()) = parse_show(repr("text/plain", x); vector_simplify, repl)
+function parse_show(x; 
+    vector_simplify=true, 
+    repl=(), 
+    # repr arguments
+    mime="text/plain",
+    context=nothing
+)
+    if isnothing(mime)
+        parse_show(repr(x; context); vector_simplify, repl)
+    else
+        parse_show(repr("text/plain", x; context); vector_simplify, repl)
+    end
+end
 
 function parse_show(x::String;
     vector_simplify=true,

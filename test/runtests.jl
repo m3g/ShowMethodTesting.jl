@@ -28,4 +28,11 @@ end
         Object with Int( 1 ),  and [ 1.0 1.4142135623730951 ]
     """
     @test_throws ArgumentError parse_show([a, a, a, a]; repl=["a", "b"])
+    # compact printing
+    @test parse_show([1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        context=:compact => true, mime=nothing, vector_simplify=false
+    ) ≈ "[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"
+    @test parse_show([1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        context=:compact => true, mime=nothing, vector_simplify=true
+    ) ≈ "[ 1  10 ]"
 end
