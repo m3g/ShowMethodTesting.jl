@@ -31,7 +31,7 @@ end
     # compact printing
     @test parse_show([1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         context=:compact => true, mime=nothing, vector_simplify=false
-    ) ≈ "[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"
+    ) ≈ "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
     @test parse_show([1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
         context=:compact => true, mime=nothing, vector_simplify=true
     ) ≈ "[ 1  10 ]"

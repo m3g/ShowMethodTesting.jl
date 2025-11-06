@@ -4,6 +4,8 @@ export ParsedShow, parse_show
 
 struct ParsedShow
     parsed_show::String
+    vector_simplify::Bool
+    repl::Any
 end
 Base.show(io::IO, ::MIME"text/plain", x::ParsedShow) = print(io, x.parsed_show)
 
@@ -88,9 +90,9 @@ function parse_show(x::String;
     # add spaces between digits and other characters (except dots), to interpret them as numbers
     s = replace(s, r"(?<=\d)(?=[^\d.])|(?<=[^\d.])(?=\d)" => s" ")
     if vector_simplify # keep only first and last array elements
-        s = replace(s, r"\[ (\S+).* (\S+)\ ]" => s"[ \1 \2 ]")
+        s = replace(s, r"(\[)([^,\]]+)(,.*,)([^,\]]+)(\])" => s"\1\2 \4\5")
     end
-    return ParsedShow(s)
+    return ParsedShow(s, vector_simplify, repl)
 end
 
 """
@@ -168,7 +170,13 @@ function Base.isapprox(
     end
     return all_match
 end
-Base.isapprox(x::ParsedShow, y::String; kargs...) = isapprox(x, parse_show(y); kargs...)
+function Base.isapprox(x::ParsedShow, y::String; kargs...) 
+    isapprox(
+        x, 
+        parse_show(y; vector_simplify=x.vector_simplify, repl=x.repl); 
+        kargs...
+    )
+end
 Base.isapprox(x::String, y::ParsedShow; kargs...) = isapprox(parse_show(x), y; kargs...)
 
 end
