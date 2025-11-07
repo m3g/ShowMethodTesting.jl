@@ -1,6 +1,8 @@
 module ShowMethodTesting
 
-export ParsedShow, parse_show
+using Test: @test
+
+export ParsedShow, parse_show, @test_show
 
 struct ParsedShow
     parsed_show::String
@@ -22,7 +24,7 @@ Parse the output of `show` to a `ParsedShow` object, which can be compared with 
 - `repl`: container of Pair(s) with custom replacements to be made before parsing. The replacements 
    will be applied from left to right for ordered collections.
 
-# Optional arguments, forwared to `repr`
+# Optional arguments, forwarded to `repr`
 
 - `mime`: MIME type of the representation
 - `context`: context of the representation
@@ -49,12 +51,12 @@ Object with Int(1), /usr/bin/bash and [1.0, 3.141592653589793, 7.5, 1.4142135623
 julia> parse_show(a) ≈ "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"
 true
 
-julia> isapprox(parse_show(a), "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"; float_match = (x,y) -> x == y, assertion_error=false)
+julia> isapprox(parse_show(a), "Object with Int(1), /usr/bin/bash and [1.0, 3.1415, 7.5, 1.4142]"; float_match = (x,y) -> x == y, print_diff=false)
 false
 ```
 
 Note that in the last line we have set the comparison function for floats to be exact, which is why the comparison fails. And the
-`assertion_error` is set to `false`, so the function returns `false` instead of throwing an error.
+`print_diff` is set to `false`, so the function does not print details about the failed comparison.
 
 """
 function parse_show(x; 
@@ -123,22 +125,31 @@ function Base.isapprox(
     float_match=(x1, x2) -> isapprox(x1, x2, rtol=1e-3),
     int_match=(x1, x2) -> x1 == x2,
     path_match=(x1, x2) -> last(splitpath(x1)) == last(splitpath(x2)),
-    assertion_error=true,
+    print_diff=true,
 )
     match(f, x1, x2) = begin
         if !f(x1, x2)
-            if assertion_error
-                throw(AssertionError("""\n
+            if print_diff
+                print("""
 
-                    show method comparison failed for $x1 ($(typeof(x1))) == $x2 ($(typeof(x2)))
+                    show method comparison failed: '$x1' ($(typeof(x1))) == '$x2' ($(typeof(x2)))
 
                     full parsed show strings:
 
-                    $x
+                    Parsed show string:
+                    ---------------------\n
+                """)
+                print(x.parsed_show)
+                print("""\n
 
-                    $y
+                    Expected output:
+                    ---------------------\n
+                """)
+                print(y.parsed_show)
+                print("""\n
+                    ---------------------
 
-                """))
+                """)
             end
             return false
         end
@@ -178,5 +189,91 @@ function Base.isapprox(x::ParsedShow, y::String; kargs...)
     )
 end
 Base.isapprox(x::String, y::ParsedShow; kargs...) = isapprox(parse_show(x), y; kargs...)
+
+"""
+    @test_show obj ≈ expected_str parse_options=(kwargs1...) match_options=(kwargs2...)
+
+Test if the show output of an object matches an expected string representation.
+
+# Arguments
+
+- `obj`: The object to test
+- `expected_str`: Expected string representation
+- `parse_options`: Keyword arguments passed to `parse_show`.
+- `match_options`: Keyword arguments passed to `isapprox`, to adjust how elements are compared.
+
+"""
+"""
+    @test_show obj ≈ expected_str parse_options=(kwargs...) match_options=(kwargs...)
+
+Test if the show output of an object matches an expected string representation.
+
+# Arguments
+- `obj`: The object to test
+- `expected_str`: Expected string representation
+- `parse_options`: Keyword arguments passed to `parse_show`
+- `match_options`: Keyword arguments passed to `isapprox`
+"""
+macro test_show(expr...)
+    if length(expr) == 0
+        throw(ArgumentError("Expression required"))
+    end
+    
+    main_expr = expr[1]
+    if !(main_expr isa Expr && main_expr.head === :call && main_expr.args[1] === :≈)
+        throw(ArgumentError("Expression must be in the form: obj ≈ expected_str"))
+    end
+    
+    obj = main_expr.args[2]
+    expected = main_expr.args[3]
+    
+    # Initialize empty keyword arguments
+    parse_kwargs = []
+    match_kwargs = []
+    
+    # Look for keyword arguments in the remaining arguments
+    for arg in expr[2:end]
+        if arg isa Expr && arg.head === :(=)
+            if arg.args[1] === :parse_options
+                # Extract keyword arguments for parse_show
+                tuple_expr = arg.args[2]
+                for kw in tuple_expr.args
+                    if kw isa Expr
+                        if kw.head === :(=)
+                            key = kw.args[1]
+                            value = kw.args[2]
+                            # Handle nested => operator
+                            if value isa Expr && value.head === :call && value.args[1] === :(=>)
+                                push!(parse_kwargs, Expr(:kw, key, Expr(:call, :(=>), esc(value.args[2]), esc(value.args[3]))))
+                            else
+                                push!(parse_kwargs, Expr(:kw, key, esc(value)))
+                            end
+                        elseif kw.head === :call && length(kw.args) == 3 && kw.args[1] === :(=>)
+                            # Handle repl pairs in arrays
+                            push!(parse_kwargs, Expr(:kw, :repl, esc(tuple_expr)))
+                            break
+                        end
+                    end
+                end
+            elseif arg.args[1] === :match_options
+                tuple_expr = arg.args[2]
+                for kw in tuple_expr.args
+                    if kw isa Expr && kw.head === :(=)
+                        push!(match_kwargs, Expr(:kw, kw.args[1], esc(kw.args[2])))
+                    end
+                end
+            end
+        end
+    end
+    
+    # Create the final test expression
+    return quote
+        @test isapprox(
+            parse_show($(esc(obj)); $(parse_kwargs...)),
+            parse_show($(esc(expected)); $(parse_kwargs...));
+            $(match_kwargs...)
+        )
+    end
+end
 
 end
