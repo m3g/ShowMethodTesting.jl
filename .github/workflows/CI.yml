@@ -3,7 +3,7 @@ on:
   - push
   - pull_request
 env:
-  JULIA_NUM_THREADS: 1 
+  JULIA_NUM_THREADS: 2 
 jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
@@ -12,8 +12,7 @@ jobs:
       fail-fast: true
       matrix:
         version:
-          - '1.9'
-          #- 'lts'
+          - 'lts'
           - 'pre'
         os:
           - ubuntu-latest
@@ -24,7 +23,7 @@ jobs:
       - uses: julia-actions/setup-julia@v2
         with:
           version: ${{ matrix.version }}
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         env:
           cache-name: cache-artifacts
         with:
