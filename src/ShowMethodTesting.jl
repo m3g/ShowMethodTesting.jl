@@ -87,8 +87,16 @@ function parse_show(x::String;
     for (k, v) in repl
         s = replace(s, k => v)
     end
-    # add spaces between digits and other characters (except dots), to interpret them as numbers
-    s = replace(s, r"(?<=\d)(?=[^\d.])|(?<=[^\d.])(?=\d)" => s" ")
+    #
+    # add spaces between digits and other characters (except dots and scientific notation), 
+    # to interpret them as numbers
+    # 
+    NUMBER_PATTERN = r"([+-]?\d*\.?\d+[eEfFrR][+-]?\d+|[+-]?\d*\.?\d+)"
+    # Replaces the matched number N with " N " (a space on each side).
+    # Then, it cleans up multiple consecutive spaces.
+    s = replace(s, NUMBER_PATTERN => s" \0 ")
+    # Clean up any leftover multiple spaces and surrounding whitespace.
+    s = replace(strip(s), r"\s+" => " ")
     if vector_simplify # keep only first and last array elements
         s = replace(s, r"(\[)([^,\]]+)(,.*,)([^,\]]+)(\])" => s"\1\2 \4\5")
     end
