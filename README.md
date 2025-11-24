@@ -1,6 +1,6 @@
 [![Build Status](https://github.com/m3g/ShowMethodTesting.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/m3g/ShowMethodTesting.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/m3g/ShowMethodTesting.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/m3g/ShowMethodTesting.jl)
-[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+[![Aqua QA](https://JuliaTesting.github.io/Aqua.jl/dev/assets/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 # ShowMethodTesting.jl
 
